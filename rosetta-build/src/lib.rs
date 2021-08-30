@@ -23,6 +23,7 @@
 
 pub mod parser;
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 use thiserror::Error;
@@ -38,7 +39,7 @@ pub fn config() -> RosettaBuilder {
 /// Please see [Getting started] on the GitHub repository for usage instructions.
 #[derive(Debug, PartialEq, Eq, Default)]
 pub struct RosettaBuilder {
-    files: Vec<(String, PathBuf)>,
+    files: HashMap<String, PathBuf>,
     fallback: Option<String>,
     output: Option<PathBuf>,
 }
@@ -46,7 +47,7 @@ pub struct RosettaBuilder {
 impl RosettaBuilder {
     /// Register a new translation source
     pub fn source(mut self, lang: impl Into<String>, path: impl Into<String>) -> Self {
-        self.files.push((lang.into(), PathBuf::from(path.into())));
+        self.files.insert(lang.into(), PathBuf::from(path.into()));
         self
     }
 
@@ -71,7 +72,7 @@ impl RosettaBuilder {
     ///
     /// This method is not publicly exposed, users should use `generate` instead.
     pub(crate) fn build(self) -> Result<RosettaConfig, ConfigError> {
-        let files = self
+        let mut files: HashMap<LanguageIdentifier, PathBuf> = self
             .files
             .into_iter()
             .map(|(lang, path)| {
@@ -82,7 +83,7 @@ impl RosettaBuilder {
 
                 Ok((lang, path))
             })
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Result<_, _>>()?;
 
         if files.is_empty() {
             return Err(ConfigError::MissingSource);
@@ -90,15 +91,14 @@ impl RosettaBuilder {
 
         let fallback = match self.fallback {
             Some(lang) => match lang.parse::<LanguageIdentifier>() {
-                Ok(lang) => lang,
+                Ok(lang) => match files.remove_entry(&lang) {
+                    Some(entry) => entry,
+                    None => return Err(ConfigError::InvalidFallback),
+                },
                 Err(_) => return Err(ConfigError::InvalidLanguage(lang.to_string())),
             },
             None => return Err(ConfigError::MissingFallback),
         };
-
-        if files.iter().find(|(lang, _)| lang == &fallback).is_none() {
-            return Err(ConfigError::InvalidFallback);
-        }
 
         let output = match self.output {
             Some(output) => output,
@@ -109,8 +109,8 @@ impl RosettaBuilder {
         };
 
         Ok(RosettaConfig {
-            files,
             fallback,
+            others: files,
             output,
         })
     }
@@ -118,8 +118,8 @@ impl RosettaBuilder {
 
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct RosettaConfig {
-    files: Vec<(LanguageIdentifier, PathBuf)>,
-    fallback: LanguageIdentifier,
+    fallback: (LanguageIdentifier, PathBuf),
+    others: HashMap<LanguageIdentifier, PathBuf>,
     output: PathBuf,
 }
 
