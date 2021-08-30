@@ -1,0 +1,16 @@
+[package]
+name = "rosetta-build"
+version = "0.1.0"
+edition = "2018"
+license = "ISC"
+description = "Code generation for the Rosetta i18n library"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde_json = "1"
+unic-langid = "0.9"
+proc-macro2 = "1"
+quote = "1"
+thiserror = "1"
+heck = "0.3"

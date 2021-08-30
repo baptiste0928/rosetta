@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "rosetta-i18n",
+    "rosetta-build",
+]
