@@ -28,15 +28,15 @@ use std::path::PathBuf;
 use thiserror::Error;
 use unic_langid::LanguageIdentifier;
 
-/// Helper function that return an empty [`RosettaBuilder`]
+/// Helper function that return an default [`RosettaBuilder`]
 pub fn config() -> RosettaBuilder {
-    RosettaBuilder::new()
+    RosettaBuilder::default()
 }
 
 /// Builder used to configure Rosetta code generation.
 ///
 /// Please see [Getting started] on the GitHub repository for usage instructions.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Default)]
 pub struct RosettaBuilder {
     files: Vec<(String, PathBuf)>,
     fallback: Option<String>,
@@ -44,15 +44,6 @@ pub struct RosettaBuilder {
 }
 
 impl RosettaBuilder {
-    /// Initialize an empty builder
-    pub fn new() -> Self {
-        RosettaBuilder {
-            files: Vec::new(),
-            fallback: None,
-            output: None,
-        }
-    }
-
     /// Register a new translation source
     pub fn source(mut self, lang: impl Into<String>, path: impl Into<String>) -> Self {
         self.files.push((lang.into(), PathBuf::from(path.into())));
@@ -93,7 +84,7 @@ impl RosettaBuilder {
             })
             .collect::<Result<Vec<_>, _>>()?;
 
-        if files.len() == 0 {
+        if files.is_empty() {
             return Err(ConfigError::MissingSource);
         }
 
