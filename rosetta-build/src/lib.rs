@@ -21,6 +21,7 @@
 //!
 //! [build script]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
 
+mod gen;
 pub mod parser;
 
 use std::collections::HashMap;
@@ -131,6 +132,14 @@ impl RosettaConfig {
     /// Get an empty [`RosettaBuilder`]
     pub fn builder() -> RosettaBuilder {
         RosettaBuilder::default()
+    }
+
+    /// Returns a list of the languages
+    pub fn languages(&self) -> Vec<&LanguageIdentifier> {
+        let mut languages: Vec<&LanguageIdentifier> =
+            self.others.iter().map(|(language, _)| language).collect();
+        languages.push(&self.fallback.0);
+        languages
     }
 }
 
