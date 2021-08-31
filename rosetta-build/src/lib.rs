@@ -37,7 +37,7 @@ pub fn config() -> RosettaBuilder {
 /// Builder used to configure Rosetta code generation.
 ///
 /// Please see [Getting started] on the GitHub repository for usage instructions.
-#[derive(Debug, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct RosettaBuilder {
     files: HashMap<String, PathBuf>,
     fallback: Option<String>,
@@ -111,7 +111,7 @@ impl RosettaBuilder {
 /// Configuration for Rosetta code generation
 ///
 /// A [`RosettaBuilder`] is provided to construct and validate configuration.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RosettaConfig {
     pub fallback: (LanguageIdentifier, PathBuf),
     pub others: HashMap<LanguageIdentifier, PathBuf>,
@@ -126,7 +126,7 @@ impl RosettaConfig {
 }
 
 /// Error type returned when the configuration passed to [`RosettaBuilder`] is invalid
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone, PartialEq, Eq)]
 pub enum ConfigError {
     /// Invalid language identifier
     #[error("`{0}` is not a valid language identifier")]
