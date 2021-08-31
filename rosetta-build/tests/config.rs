@@ -15,6 +15,7 @@ fn config_simple() -> Result<(), Box<dyn std::error::Error>> {
     let expected = RosettaConfig {
         fallback: (langid!("en"), PathBuf::from("translations/en.json")),
         others: hashmap! { langid!("fr") => PathBuf::from("translations/fr.json") },
+        name: "Lang".to_string(),
         output: None,
     };
 

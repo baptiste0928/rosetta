@@ -41,6 +41,7 @@ pub fn config() -> RosettaBuilder {
 pub struct RosettaBuilder {
     files: HashMap<String, PathBuf>,
     fallback: Option<String>,
+    name: Option<String>,
     output: Option<PathBuf>,
 }
 
@@ -54,6 +55,12 @@ impl RosettaBuilder {
     /// Register the fallback locale
     pub fn fallback(mut self, lang: impl Into<String>) -> Self {
         self.fallback = Some(lang.into());
+        self
+    }
+
+    /// Define a custom name for the output type
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = Some(name.into());
         self
     }
 
@@ -103,6 +110,7 @@ impl RosettaBuilder {
         Ok(RosettaConfig {
             fallback,
             others: files,
+            name: self.name.unwrap_or_else(|| "Lang".to_string()),
             output: self.output,
         })
     }
@@ -115,6 +123,7 @@ impl RosettaBuilder {
 pub struct RosettaConfig {
     pub fallback: (LanguageIdentifier, PathBuf),
     pub others: HashMap<LanguageIdentifier, PathBuf>,
+    pub name: String,
     pub output: Option<PathBuf>,
 }
 
