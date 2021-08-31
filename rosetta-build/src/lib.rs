@@ -58,8 +58,8 @@ impl RosettaBuilder {
     }
 
     /// Change the default output of generated files
-    pub fn output(mut self, path: impl Into<String>) -> Self {
-        self.output = Some(PathBuf::from(path.into()));
+    pub fn output(mut self, path: impl Into<PathBuf>) -> Self {
+        self.output = Some(path.into());
         self
     }
 
@@ -68,10 +68,10 @@ impl RosettaBuilder {
         let _ = self.build();
     }
 
-    /// Validate configuration a returns a [`RosettaConfig`]
+    /// Validate configuration and build a [`RosettaConfig`]
     ///
-    /// This method is not publicly exposed, users should use `generate` instead.
-    pub(crate) fn build(self) -> Result<RosettaConfig, ConfigError> {
+    /// You probably don't need to call this explicitly, use [`generate`](Self::generate) instead.
+    pub fn build(self) -> Result<RosettaConfig, ConfigError> {
         let mut files: HashMap<LanguageIdentifier, PathBuf> = self
             .files
             .into_iter()
@@ -100,27 +100,29 @@ impl RosettaBuilder {
             None => return Err(ConfigError::MissingFallback),
         };
 
-        let output = match self.output {
-            Some(output) => output,
-            None => {
-                let dest = std::env::var("OUT_DIR").unwrap();
-                PathBuf::from(dest).join("rosetta.rs")
-            }
-        };
-
         Ok(RosettaConfig {
             fallback,
             others: files,
-            output,
+            output: self.output,
         })
     }
 }
 
+/// Configuration for Rosetta code generation
+///
+/// A [`RosettaBuilder`] is provided to construct and validate configuration.
 #[derive(Debug, PartialEq, Eq)]
-pub(crate) struct RosettaConfig {
-    fallback: (LanguageIdentifier, PathBuf),
-    others: HashMap<LanguageIdentifier, PathBuf>,
-    output: PathBuf,
+pub struct RosettaConfig {
+    pub fallback: (LanguageIdentifier, PathBuf),
+    pub others: HashMap<LanguageIdentifier, PathBuf>,
+    pub output: Option<PathBuf>,
+}
+
+impl RosettaConfig {
+    /// Get an empty [`RosettaBuilder`]
+    pub fn builder() -> RosettaBuilder {
+        RosettaBuilder::default()
+    }
 }
 
 /// Error type returned when the configuration passed to [`RosettaBuilder`] is invalid

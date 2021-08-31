@@ -1,18 +1,15 @@
-use std::str::FromStr;
-
 use maplit::hashmap;
 use rosetta_build::parser::*;
 use serde_json::json;
-use unic_langid::LanguageIdentifier;
+use unic_langid::langid;
 
 #[test]
 fn parse_simple() -> Result<(), Box<dyn std::error::Error>> {
     let en = json!({ "hello": "Hello world!" });
     let fr = json!({"hello": "Bonjour le monde !"});
-    let fr_lang = LanguageIdentifier::from_str("fr")?;
 
     let mut parsed = TranslationData::from_fallback(en)?;
-    parsed.parse_file(fr_lang.clone(), fr)?;
+    parsed.parse_file(langid!("fr"), fr)?;
 
     assert_eq!(parsed.keys.len(), 1);
     assert!(parsed.keys.get("hello").is_some());
@@ -20,7 +17,7 @@ fn parse_simple() -> Result<(), Box<dyn std::error::Error>> {
     let expected = TranslationKey::Simple {
         fallback: "Hello world!".to_string(),
         others: hashmap! {
-            fr_lang => "Bonjour le monde !".to_string()
+            langid!("fr") => "Bonjour le monde !".to_string()
         },
     };
 

@@ -17,3 +17,4 @@ heck = "0.3"
 
 [dev-dependencies]
 maplit = "1"
+unic-langid = { version = "0.9", features = ["macros"] }
