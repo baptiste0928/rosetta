@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
+use icu_locid_macros::langid;
 use maplit::hashmap;
 use rosetta_build::RosettaConfig;
-use unic_langid::langid;
 
 #[test]
 fn config_simple() -> Result<(), Box<dyn std::error::Error>> {

@@ -1,7 +1,7 @@
+use icu_locid_macros::langid;
 use maplit::hashmap;
 use rosetta_build::parser::*;
 use serde_json::json;
-use unic_langid::langid;
 
 #[test]
 fn parse_simple() -> Result<(), Box<dyn std::error::Error>> {

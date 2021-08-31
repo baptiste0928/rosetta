@@ -8,13 +8,14 @@
 //! ```
 //! use rosetta_build::parser::TranslationData;
 //! # use serde_json::json;
+//! # use icu_locid_macros::langid;
 //!
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! let en = json!({ "hello": "Hello world!" });
 //! let fr = json!({ "hello": "Bonjour le monde !" });
 //!
 //! let mut parsed = TranslationData::from_fallback(en)?;
-//! parsed.parse_file("fr".parse()?, fr)?;
+//! parsed.parse_file(langid!("fr"), fr)?;
 //!
 //! assert_eq!(parsed.keys.len(), 1);
 //! # Ok(())
@@ -25,9 +26,9 @@
 
 use std::collections::HashMap;
 
+use icu_locid::LanguageIdentifier;
 use serde_json::Value;
 use thiserror::Error;
-use unic_langid::LanguageIdentifier;
 
 /// Data structure containing all translation keys
 ///

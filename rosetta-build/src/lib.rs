@@ -26,8 +26,8 @@ pub mod parser;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+use icu_locid::LanguageIdentifier;
 use thiserror::Error;
-use unic_langid::LanguageIdentifier;
 
 /// Helper function that return an default [`RosettaBuilder`]
 pub fn config() -> RosettaBuilder {

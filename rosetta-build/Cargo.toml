@@ -9,7 +9,7 @@ description = "Code generation for the Rosetta i18n library"
 
 [dependencies]
 serde_json = "1"
-unic-langid = "0.9"
+icu_locid = "0.3"
 proc-macro2 = "1"
 quote = "1"
 thiserror = "1"
@@ -17,4 +17,4 @@ heck = "0.3"
 
 [dev-dependencies]
 maplit = "1"
-unic-langid = { version = "0.9", features = ["macros"] }
+icu_locid_macros = "0.3"
