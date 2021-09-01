@@ -151,10 +151,12 @@ impl RosettaConfig {
     pub fn generate(&self) -> Result<(), BuildError> {
         let fallback_content = open_file(&self.fallback.1)?;
         let mut parsed = parser::TranslationData::from_fallback(fallback_content)?;
+        println!("cargo:rerun-if-changed={}", self.fallback.1.to_string_lossy());
 
         for (language, path) in &self.others {
             let content = open_file(path)?;
             parsed.parse_file(language.clone(), content)?;
+            println!("cargo:rerun-if-changed={}", path.to_string_lossy());
         }
 
         let generated = gen::CodeGenerator::new(&parsed, self).generate();
