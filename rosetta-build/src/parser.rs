@@ -172,7 +172,7 @@ impl ParsedKey {
 }
 
 /// Error type returned when a parsing error occurs
-#[derive(Debug, Error, PartialEq, Eq)]
+#[derive(Debug, Error, Clone, PartialEq, Eq)]
 pub enum ParseError {
     /// File root is not a JSON object
     #[error("file root must be a json object")]

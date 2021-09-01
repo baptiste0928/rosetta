@@ -1,3 +1,15 @@
+//! Code generation
+//!
+//! # Generated code
+//! The generated code consists of a single enum (called by default `Lang`),
+//! which expose public method for each of the translation keys. These
+//! methods returns a `&'static str` where possible, otherwise a `String`.
+//!
+//! # Usage
+//! The code generator is contained within the [`CodeGenerator`] struct.
+//! Calling [`generate`](CodeGenerator::generate) will produce a [TokenStream]
+//! with the generated code. Internal methods used to generate the output are not exposed.
+
 use std::collections::HashMap;
 
 use heck::CamelCase;
@@ -10,18 +22,20 @@ use crate::{
     RosettaConfig,
 };
 
-pub(crate) struct CodeGen<'a> {
+/// Type storing state and configuration for the code generator
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CodeGenerator<'a> {
     keys: &'a HashMap<String, TranslationKey>,
     languages: Vec<&'a LanguageIdentifier>,
     name: Ident,
 }
 
-impl<'a> CodeGen<'a> {
-    /// Initialize a new [`CodeGen`]
-    pub(crate) fn new(data: &'a TranslationData, config: &'a RosettaConfig) -> Self {
+impl<'a> CodeGenerator<'a> {
+    /// Initialize a new [`CodeGenerator`]
+    pub fn new(data: &'a TranslationData, config: &'a RosettaConfig) -> Self {
         let name = Ident::new(&config.name, Span::call_site());
 
-        CodeGen {
+        CodeGenerator {
             keys: &data.keys,
             languages: config.languages(),
             name,
@@ -29,7 +43,7 @@ impl<'a> CodeGen<'a> {
     }
 
     /// Generate code as a [`TokenStream`]
-    pub(crate) fn generate(&self) -> TokenStream {
+    pub fn generate(&self) -> TokenStream {
         // Transform as CamelCase strings
         let languages: Vec<_> = self
             .languages

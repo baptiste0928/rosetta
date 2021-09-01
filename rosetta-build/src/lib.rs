@@ -21,13 +21,17 @@
 //!
 //! [build script]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
 
-mod gen;
+pub mod gen;
 pub mod parser;
 
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::env;
+use std::fs::File;
+use std::io::Write;
+use std::path::{Path, PathBuf};
 
 use icu_locid::LanguageIdentifier;
+use serde_json::Value;
 use thiserror::Error;
 
 /// Helper function that return an default [`RosettaBuilder`]
@@ -141,6 +145,50 @@ impl RosettaConfig {
         languages.push(&self.fallback.0);
         languages
     }
+
+    /// Generate locale files and write them to the output location
+    pub fn generate(&self) -> Result<(), BuildError> {
+        let fallback_content = RosettaConfig::open_file(&self.fallback.1)?;
+        let mut parsed = parser::TranslationData::from_fallback(fallback_content)?;
+
+        for (language, path) in &self.others {
+            let content = RosettaConfig::open_file(path)?;
+            parsed.parse_file(language.clone(), content)?;
+        }
+
+        let generated = gen::CodeGenerator::new(&parsed, self).generate();
+
+        let output = match &self.output {
+            Some(path) => path.clone(),
+            None => Path::new(&env::var("OUT_DIR")?).join("rosetta.rs"),
+        };
+
+        let mut file = File::create(&output)?;
+        file.write_all(generated.to_string().as_bytes())?;
+
+        Ok(())
+    }
+
+    /// Open a file and read its content as a JSON [`Value`]
+    fn open_file(path: &Path) -> Result<Value, BuildError> {
+        let content = match std::fs::read_to_string(path) {
+            Ok(content) => content,
+            Err(error) => {
+                return Err(BuildError::FileRead {
+                    file: path.to_path_buf(),
+                    source: error,
+                })
+            }
+        };
+
+        match serde_json::from_str(&content) {
+            Ok(parsed) => Ok(parsed),
+            Err(error) => Err(BuildError::JsonParse {
+                file: path.to_path_buf(),
+                source: error,
+            }),
+        }
+    }
 }
 
 /// Error type returned when the configuration passed to [`RosettaBuilder`] is invalid
@@ -158,4 +206,25 @@ pub enum ConfigError {
     /// The fallback language doesn't match any source
     #[error("no source corresponding to the fallback language was found")]
     InvalidFallback,
+}
+
+/// Error type returned when the code generation failed for some reason
+#[derive(Debug, Error)]
+pub enum BuildError {
+    #[error("failed to read `{file}`: {source}")]
+    FileRead {
+        file: PathBuf,
+        source: std::io::Error,
+    },
+    #[error("failed to write output: {0}")]
+    FileWrite(#[from] std::io::Error),
+    #[error("failed to load {file}: {source}")]
+    JsonParse {
+        file: PathBuf,
+        source: serde_json::Error,
+    },
+    #[error("failed to parse translations: {0}")]
+    Parse(#[from] parser::ParseError),
+    #[error("failed to read env variable: {0}")]
+    Var(#[from] env::VarError),
 }
