@@ -88,6 +88,7 @@ impl<'a> CodeGenerator<'a> {
             .map(|(language, value)| self.match_arm_simple(language, value));
 
         quote! {
+            #[allow(clippy::match_single_binding)]
             pub fn #name(&self) -> &'static str {
                 match self {
                     #(#arms,)*

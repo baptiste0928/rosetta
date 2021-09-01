@@ -207,7 +207,7 @@ fn rustfmt(path: &Path) -> Result<(), BuildError> {
         .args(&["--emit", "files"])
         .arg(path)
         .output()
-        .map_err(|e| BuildError::Fmt(e))?;
+        .map_err(BuildError::Fmt)?;
 
     Ok(())
 }
