@@ -76,8 +76,9 @@ impl RosettaBuilder {
     }
 
     /// Generate locale files and write them to the output location
-    pub fn generate(self) {
-        let _ = self.build();
+    pub fn generate(self) -> Result<(), BuildError> {
+        self.build()?.generate()?;
+        Ok(())
     }
 
     /// Validate configuration and build a [`RosettaConfig`]
@@ -148,11 +149,11 @@ impl RosettaConfig {
 
     /// Generate locale files and write them to the output location
     pub fn generate(&self) -> Result<(), BuildError> {
-        let fallback_content = RosettaConfig::open_file(&self.fallback.1)?;
+        let fallback_content = open_file(&self.fallback.1)?;
         let mut parsed = parser::TranslationData::from_fallback(fallback_content)?;
 
         for (language, path) in &self.others {
-            let content = RosettaConfig::open_file(path)?;
+            let content = open_file(path)?;
             parsed.parse_file(language.clone(), content)?;
         }
 
@@ -166,29 +167,47 @@ impl RosettaConfig {
         let mut file = File::create(&output)?;
         file.write_all(generated.to_string().as_bytes())?;
 
+        if cfg!(feature = "rustfmt") {
+            rustfmt(&output)?;
+        }
+
         Ok(())
     }
+}
 
-    /// Open a file and read its content as a JSON [`Value`]
-    fn open_file(path: &Path) -> Result<Value, BuildError> {
-        let content = match std::fs::read_to_string(path) {
-            Ok(content) => content,
-            Err(error) => {
-                return Err(BuildError::FileRead {
-                    file: path.to_path_buf(),
-                    source: error,
-                })
-            }
-        };
-
-        match serde_json::from_str(&content) {
-            Ok(parsed) => Ok(parsed),
-            Err(error) => Err(BuildError::JsonParse {
+/// Open a file and read its content as a JSON [`Value`]
+fn open_file(path: &Path) -> Result<Value, BuildError> {
+    let content = match std::fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(error) => {
+            return Err(BuildError::FileRead {
                 file: path.to_path_buf(),
                 source: error,
-            }),
+            })
         }
+    };
+
+    match serde_json::from_str(&content) {
+        Ok(parsed) => Ok(parsed),
+        Err(error) => Err(BuildError::JsonParse {
+            file: path.to_path_buf(),
+            source: error,
+        }),
     }
+}
+
+/// Format a file with rustfmt
+#[cfg(feature = "rustfmt")]
+fn rustfmt(path: &Path) -> Result<(), BuildError> {
+    use std::process::Command;
+
+    Command::new(env::var("RUSTFMT").unwrap_or_else(|_| "rustfmt".to_string()))
+        .args(&["--emit", "files"])
+        .arg(path)
+        .output()
+        .map_err(|e| BuildError::Fmt(e))?;
+
+    Ok(())
 }
 
 /// Error type returned when the configuration passed to [`RosettaBuilder`] is invalid
@@ -211,6 +230,8 @@ pub enum ConfigError {
 /// Error type returned when the code generation failed for some reason
 #[derive(Debug, Error)]
 pub enum BuildError {
+    #[error("invalid configuration: {0}")]
+    Config(#[from] ConfigError),
     #[error("failed to read `{file}`: {source}")]
     FileRead {
         file: PathBuf,
@@ -227,4 +248,6 @@ pub enum BuildError {
     Parse(#[from] parser::ParseError),
     #[error("failed to read env variable: {0}")]
     Var(#[from] env::VarError),
+    #[error("failed to run rustfmt: {0}")]
+    Fmt(#[source] std::io::Error),
 }

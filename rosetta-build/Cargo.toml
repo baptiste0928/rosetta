@@ -15,6 +15,10 @@ quote = "1"
 thiserror = "1"
 heck = "0.3"
 
+[features]
+default = ["rustfmt"]
+rustfmt = []
+
 [dev-dependencies]
 maplit = "1"
 icu_locid_macros = "0.3"
