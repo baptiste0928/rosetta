@@ -2,4 +2,5 @@
 members = [
     "rosetta-i18n",
     "rosetta-build",
+    "rosetta-test"
 ]

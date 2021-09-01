@@ -1,0 +1,9 @@
+[package]
+name = "rosetta-test"
+version = "0.1.0"
+edition = "2018"
+license = "ISC"
+publish = false
+
+[build-dependencies]
+rosetta-build = { path = "../rosetta-build" }

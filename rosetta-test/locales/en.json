@@ -1,0 +1,4 @@
+{
+    "hello": "Hello world!",
+    "fallback": "This key does not exist in fr.json"
+}
