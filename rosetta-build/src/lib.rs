@@ -151,7 +151,10 @@ impl RosettaConfig {
     pub fn generate(&self) -> Result<(), BuildError> {
         let fallback_content = open_file(&self.fallback.1)?;
         let mut parsed = parser::TranslationData::from_fallback(fallback_content)?;
-        println!("cargo:rerun-if-changed={}", self.fallback.1.to_string_lossy());
+        println!(
+            "cargo:rerun-if-changed={}",
+            self.fallback.1.to_string_lossy()
+        );
 
         for (language, path) in &self.others {
             let content = open_file(path)?;
@@ -163,7 +166,7 @@ impl RosettaConfig {
 
         let output = match &self.output {
             Some(path) => path.clone(),
-            None => Path::new(&env::var("OUT_DIR")?).join("rosetta.rs"),
+            None => Path::new(&env::var("OUT_DIR")?).join("rosetta_output.rs"),
         };
 
         let mut file = File::create(&output)?;

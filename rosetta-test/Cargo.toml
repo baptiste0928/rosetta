@@ -5,5 +5,8 @@ edition = "2018"
 license = "ISC"
 publish = false
 
+[dependencies]
+rosetta-i18n = { path = "../rosetta-i18n" }
+
 [build-dependencies]
 rosetta-build = { path = "../rosetta-build" }
