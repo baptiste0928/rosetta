@@ -1,34 +1,13 @@
 //! Translations files parsing
 //!
-//! # Usage
-//! Parsed translations files are represented as a [TranslationData].
-//! This type must be initialized with the fallback language before parsing other languages.
-//! Files must be provided as JSON [`Value`].
-//!
-//! ```
-//! use rosetta_build::parser::TranslationData;
-//! # use serde_json::json;
-//! # use icu_locid_macros::langid;
-//!
-//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
-//! let en = json!({ "hello": "Hello world!" });
-//! let fr = json!({ "hello": "Bonjour le monde !" });
-//!
-//! let mut parsed = TranslationData::from_fallback(en)?;
-//! parsed.parse_file(langid!("fr"), fr)?;
-//!
-//! assert_eq!(parsed.keys.len(), 1);
-//! # Ok(())
-//! # }
-//! ```
-//!
+//! Files are parsed as [TranslationData] from a provided [JsonValue].
 //! Parsed keys are represented as [TranslationKey].
 
 use std::collections::HashMap;
 
-use icu_locid::LanguageIdentifier;
-use serde_json::Value;
-use thiserror::Error;
+use tinyjson::JsonValue;
+
+use crate::{error::ParseError, LanguageId};
 
 /// Data structure containing all translation keys
 ///
@@ -36,15 +15,15 @@ use thiserror::Error;
 /// then keys will be populated with other languages using the [`parse_file`] method.
 ///
 /// [`parse_file`]: Self::parse_file
-#[derive(Debug, PartialEq, Eq)]
-pub struct TranslationData {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct TranslationData {
     /// Parsed translation keys
-    pub keys: HashMap<String, TranslationKey>,
+    pub(crate) keys: HashMap<String, TranslationKey>,
 }
 
 impl TranslationData {
     /// Initialize a [`TranslationData`] instance from the fallback language
-    pub fn from_fallback(file: Value) -> Result<Self, ParseError> {
+    pub(crate) fn from_fallback(file: JsonValue) -> Result<Self, ParseError> {
         let parsed = ParsedFile::parse(file)?;
         let keys = parsed
             .keys
@@ -56,10 +35,10 @@ impl TranslationData {
     }
 
     /// Parse a language file and insert its content into the current [`TranslationData`]
-    pub fn parse_file(
+    pub(crate) fn parse_file(
         &mut self,
-        language: LanguageIdentifier,
-        file: Value,
+        language: LanguageId,
+        file: JsonValue,
     ) -> Result<(), ParseError> {
         let parsed = ParsedFile::parse(file)?;
         for (key, parsed) in parsed.keys {
@@ -81,14 +60,14 @@ impl TranslationData {
 /// A parsed translation key
 ///
 /// This enum can be constructed by parsing a translation file with [TranslationData].
-#[derive(Debug, PartialEq, Eq)]
-pub enum TranslationKey {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum TranslationKey {
     /// Simple string key, without any interpolation or plurals
     Simple {
         /// The key value for the fallback language
         fallback: String,
         /// Key values for other languages
-        others: HashMap<LanguageIdentifier, String>,
+        others: HashMap<LanguageId, String>,
     },
 }
 
@@ -107,7 +86,7 @@ impl TranslationKey {
     #[allow(unreachable_patterns)]
     fn insert_parsed(
         &mut self,
-        language: LanguageIdentifier,
+        language: LanguageId,
         key: &str,
         parsed: ParsedKey,
     ) -> Result<(), ParseError> {
@@ -131,16 +110,16 @@ impl TranslationKey {
 }
 
 /// Raw representation of a parsed file
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct ParsedFile {
     keys: HashMap<String, ParsedKey>,
 }
 
 impl ParsedFile {
-    /// Parse a JSON [`Value`] as a translations file
-    fn parse(file: Value) -> Result<Self, ParseError> {
+    /// Parse a JSON [`JsonValue`] as a translations file
+    fn parse(file: JsonValue) -> Result<Self, ParseError> {
         let input = match file {
-            Value::Object(map) => map,
+            JsonValue::Object(map) => map,
             _ => return Err(ParseError::InvalidRoot),
         };
 
@@ -155,7 +134,7 @@ impl ParsedFile {
 }
 
 /// Raw representation of a parsed key
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 enum ParsedKey {
     /// Simple string key
     Simple(String),
@@ -163,24 +142,67 @@ enum ParsedKey {
 
 impl ParsedKey {
     /// Parse a JSON [`Value`] as a key
-    fn parse(key: &str, value: Value) -> Result<Self, ParseError> {
+    fn parse(key: &str, value: JsonValue) -> Result<Self, ParseError> {
         match value {
-            Value::String(value) => Ok(ParsedKey::Simple(value)),
+            JsonValue::String(value) => Ok(ParsedKey::Simple(value)),
             _ => Err(ParseError::InvalidValue { key: key.into() }),
         }
     }
 }
 
-/// Error type returned when a parsing error occurs
-#[derive(Debug, Error, Clone, PartialEq, Eq)]
-pub enum ParseError {
-    /// File root is not a JSON object
-    #[error("file root must be a json object")]
-    InvalidRoot,
-    /// Invalid key type (raw parsing)
-    #[error("`{key}` is an invalid type")]
-    InvalidValue { key: String },
-    /// Invalid key type (doesn't match previous parsed keys)
-    #[error("`{key}` doesn't match previous parsed key (expected {expected})")]
-    InvalidType { key: String, expected: &'static str },
+#[cfg(test)]
+mod tests {
+    use super::{TranslationData, TranslationKey};
+    use crate::{error::ParseError, LanguageId};
+
+    use maplit::hashmap;
+    use tinyjson::JsonValue;
+
+    macro_rules! json {
+        ($value:tt) => {
+            stringify!($value).parse::<JsonValue>().unwrap()
+        };
+    }
+
+    #[test]
+    fn parse_simple() -> Result<(), Box<dyn std::error::Error>> {
+        let en = json!({ "hello": "Hello world!" });
+        let fr = json!({ "hello": "Bonjour le monde !" });
+
+        let mut parsed = TranslationData::from_fallback(en)?;
+        parsed.parse_file(LanguageId("fr".into()), fr)?;
+
+        assert_eq!(parsed.keys.len(), 1);
+        assert!(parsed.keys.get("hello").is_some());
+
+        let expected = TranslationKey::Simple {
+            fallback: "Hello world!".to_string(),
+            others: hashmap! {
+                LanguageId("fr".into()) => "Bonjour le monde !".to_string()
+            },
+        };
+
+        assert_eq!(parsed.keys.get("hello").unwrap(), &expected);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parse_invalid_root() {
+        let file = json!("invalid");
+        let parsed = TranslationData::from_fallback(file);
+        assert_eq!(parsed, Err(ParseError::InvalidRoot));
+    }
+
+    #[test]
+    fn parse_invalid_value() {
+        let file = json!({ "hello": ["Hello world!"] });
+        let parsed = TranslationData::from_fallback(file);
+        assert_eq!(
+            parsed,
+            Err(ParseError::InvalidValue {
+                key: "hello".to_string()
+            })
+        );
+    }
 }

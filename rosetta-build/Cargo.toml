@@ -8,12 +8,10 @@ description = "Code generation for the Rosetta i18n library"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde_json = "1"
-icu_locid = "0.3"
+convert_case = "0.4"
 proc-macro2 = "1"
 quote = "1"
-thiserror = "1"
-heck = "0.3"
+tinyjson = "2"
 
 [features]
 default = ["rustfmt"]
@@ -21,4 +19,3 @@ rustfmt = []
 
 [dev-dependencies]
 maplit = "1"
-icu_locid_macros = "0.3"
