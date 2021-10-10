@@ -15,6 +15,12 @@ mod tests {
     }
 
     #[test]
+    fn test_formatted() {
+        assert_eq!(Lang::En.hello_name("John"), "Hello John!");
+        assert_eq!(Lang::Fr.hello_name("John"), "Bonjour John !");
+    }
+
+    #[test]
     fn test_fallback() {
         assert_eq!(Lang::Fr.fallback(), Lang::En.fallback());
     }

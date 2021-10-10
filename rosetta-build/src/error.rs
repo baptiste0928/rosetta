@@ -112,6 +112,12 @@ pub enum ParseError {
     InvalidValue { key: String },
     /// Invalid key type (doesn't match previous parsed keys)
     InvalidType { key: String, expected: &'static str },
+    /// Invalid parameters supplied to interpolated key (missing and/or unknown parameters)
+    InvalidParameters {
+        key: String,
+        missing: Vec<String>,
+        unknown: Vec<String>,
+    },
     /// Invalid language identifier (not ISO 693-1 compliant)
     InvalidLanguageId { value: String },
 }
@@ -127,6 +133,15 @@ impl Display for ParseError {
                 f,
                 "`{}` doesn't match previous parsed key (expected {})",
                 key, expected
+            ),
+            ParseError::InvalidParameters {
+                key,
+                missing,
+                unknown,
+            } => write!(
+                f,
+                "invalid parameters supplied to `{}` (missing: {:?}, unknown: {:?})",
+                key, missing, unknown
             ),
             ParseError::InvalidLanguageId { value } => write!(
                 f,
