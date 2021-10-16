@@ -17,9 +17,8 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 
 use crate::{
-    config::RosettaConfig,
+    builder::{LanguageId, RosettaConfig},
     parser::{FormattedKey, SimpleKey, TranslationData, TranslationKey},
-    LanguageId,
 };
 
 /// Type storing state and configuration for the code generator

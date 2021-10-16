@@ -9,7 +9,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use tinyjson::JsonValue;
 
-use crate::{error::ParseError, LanguageId};
+use crate::{builder::LanguageId, error::ParseError};
 
 /// Data structure containing all translation keys
 ///
@@ -249,9 +249,9 @@ struct ParsedKeyData<'a> {
 mod tests {
     use super::{TranslationData, TranslationKey};
     use crate::{
+        builder::LanguageId,
         error::ParseError,
         parser::{FormattedKey, SimpleKey},
-        LanguageId,
     };
 
     use maplit::{hashmap, hashset};
