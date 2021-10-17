@@ -73,7 +73,7 @@ impl Display for BuildError {
                 write!(f, "failed to load {:?}: {}", file, source)
             }
             BuildError::Parse(error) => write!(f, "failed to parse translations: {}", error),
-            BuildError::Var(error) => write!(f, "failed to read environnement variable: {}", error),
+            BuildError::Var(error) => write!(f, "failed to read environment variable: {}", error),
             BuildError::Fmt(error) => write!(f, "failed to run rustfmt: {}", error),
         }
     }
