@@ -1,6 +1,15 @@
 [package]
 name = "rosetta-i18n"
 version = "0.1.0"
+description = "Easy to use i18n library based on code generation."
+categories = ["internationalization", "development-tools::build-utils", "parsing"]
+keywords = ["i18n"]
+authors = ["baptiste0928"]
+readme = "README.md"
+homepage = "https://github.com/baptiste0928/rosetta#readme"
+repository = "https://github.com/baptiste0928/rosetta"
+documentation = "https://docs.rs/rosetta-i18n"
+license = "ISC"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

@@ -1,9 +1,16 @@
 [package]
 name = "rosetta-build"
 version = "0.1.0"
-edition = "2018"
+description = "Code generation for the Rosetta i18n library."
+categories = ["internationalization", "development-tools::build-utils", "parsing"]
+keywords = ["i18n"]
+authors = ["baptiste0928"]
+readme = "README.md"
+homepage = "https://github.com/baptiste0928/rosetta#readme"
+repository = "https://github.com/baptiste0928/rosetta"
+documentation = "https://docs.rs/rosetta-build"
 license = "ISC"
-description = "Code generation for the Rosetta i18n library"
+edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
