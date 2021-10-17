@@ -1,5 +1,5 @@
 {
     "hello": "Hello world!",
     "hello_name": "Hello {name}!",
-    "fallback": "This key does not exist in fr.json"
+    "fallback_key": "This key does not exist in fr.json"
 }
