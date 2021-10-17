@@ -1,12 +1,30 @@
-//! # Rosetta i18n library
+//! Easy-to-use i18n library for Rust, based on code generation.
 //!
-//! Rosetta is an easy-to-use and opinionated internationalization (i18n) library for Rust, based on code generation.
+//! ## Usage
+//! Please read the [README] on the GitHub repository to learn how to use this library.
+//!
+//! ```ignore
+//! mod translations {
+//!     rosetta_i18n::include_translations!();
+//! }
+//!
+//! fn main() {
+//!     assert_eq!(Lang::En.hello(), "Hello world!");
+//! }
+//! ```
+//!
+//! ## Serde support
+//! This crate provide serialization and deserialization of languages types with Serde.
+//! The `serde` feature must be enabled.
+//!
+//! [README]: https://github.com/baptiste0928/rosetta#readme
 
 use std::borrow::Cow;
 
 #[doc(hidden)]
 pub mod provider;
 #[cfg(feature = "serde")]
+#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
 pub mod serde_helpers;
 
 /// Include the generated translations.
@@ -86,7 +104,7 @@ impl Language for GenericLanguage {
 /// (2 character alphanumeric ascii string).
 ///
 /// ## Serde support
-/// This type implements the [`Serialize`] and [`Deserialize`] traits if the `serde` feature is enabled.
+/// This type implements the `Serialize` and `Deserialize` traits if the `serde` feature is enabled.
 /// Deserialization will fail if the value is not an ISO 639-1 language identifier.
 ///
 /// ## Example
@@ -102,8 +120,6 @@ impl Language for GenericLanguage {
 ///
 /// [ISO 693-1]: https://en.wikipedia.org/wiki/ISO_639-1
 /// [`validate`]: LanguageId::validate
-/// [`Serialize`]: serde::Serialize
-/// [`Deserialize`]: serde::Deserialize
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LanguageId<'a>(Cow<'a, str>);
 
