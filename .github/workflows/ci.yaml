@@ -53,9 +53,12 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v1
+
       - name: Build docs
         env:
-          RUSTDOCFLAGS: -D broken_intra_doc_links
+          RUSTDOCFLAGS: -D rustdoc::broken_intra_doc_links
         run: cargo doc --no-deps --all-features
 
   codespell:
