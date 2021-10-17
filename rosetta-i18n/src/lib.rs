@@ -57,7 +57,7 @@ pub trait Language: Sized {
     ///
     /// The method returns [`None`] if the provided language id is not supported
     /// by the struct.
-    fn from_language_id(language_id: LanguageId) -> Option<Self>;
+    fn from_language_id(language_id: &LanguageId) -> Option<Self>;
     /// Convert this struct to a [`LanguageId`].
     fn language_id(&self) -> LanguageId;
     /// Get the fallback language of this type.
@@ -78,8 +78,8 @@ pub trait Language: Sized {
 pub struct GenericLanguage(String);
 
 impl Language for GenericLanguage {
-    fn from_language_id(language_id: LanguageId) -> Option<Self> {
-        Some(Self(language_id.into_inner()))
+    fn from_language_id(language_id: &LanguageId) -> Option<Self> {
+        Some(Self(language_id.value().into()))
     }
 
     fn language_id(&self) -> LanguageId {
@@ -111,11 +111,11 @@ impl Language for GenericLanguage {
 /// ```
 /// use rosetta_i18n::LanguageId;
 ///
-/// let lang_id = LanguageId::new("fr");
-/// assert_eq!(lang_id.value(), "fr");
+/// let language_id = LanguageId::new("fr");
+/// assert_eq!(language_id.value(), "fr");
 ///
-/// let lang_id = LanguageId::validate("fr");
-/// assert!(lang_id.is_some());
+/// let language_id = LanguageId::validate("fr");
+/// assert!(language_id.is_some());
 /// ```
 ///
 /// [ISO 693-1]: https://en.wikipedia.org/wiki/ISO_639-1
@@ -124,31 +124,18 @@ impl Language for GenericLanguage {
 pub struct LanguageId<'a>(Cow<'a, str>);
 
 impl<'a> LanguageId<'a> {
-    /// Initialize a new [`LanguageId`] from a string reference.
-    ///
-    /// The provided value should be an [ISO 693-1] encoded language id.
-    ///
-    /// [ISO 693-1]: https://en.wikipedia.org/wiki/ISO_639-1
-    pub fn new(value: &'a str) -> Self {
-        Self(Cow::Borrowed(value))
-    }
-
-    /// Initialize a new [`LanguageId`] from an owned [String].
-    ///
-    /// The provided value should be an [ISO 693-1] encoded language id.
-    ///
-    /// [ISO 693-1]: https://en.wikipedia.org/wiki/ISO_639-1
-    pub fn from_string(value: String) -> Self {
-        Self(Cow::Owned(value))
-    }
-
     /// Initialize a new valid [`LanguageId`].
     ///
-    /// Unlike [`new`] and [`from_string`], this method ensures that the provided
+    /// Unlike [`new`], this method ensures that the provided
     /// value is a valid [ISO 693-1] encoded language id.
     ///
+    /// ```
+    /// # use rosetta_i18n::LanguageId;
+    /// assert!(LanguageId::validate("fr").is_some());
+    /// assert!(LanguageId::validate("invalid").is_none());
+    /// ```
+    ///
     /// [`new`]: LanguageId::new
-    /// [`from_string`]: LanguageId::from_string
     /// [ISO 693-1]: https://en.wikipedia.org/wiki/ISO_639-1
     pub fn validate(value: &str) -> Option<Self> {
         let valid_length = value.len() == 2;
@@ -159,6 +146,23 @@ impl<'a> LanguageId<'a> {
         } else {
             None
         }
+    }
+
+    /// Initialize a new [`LanguageId`] from a string.
+    ///
+    /// The provided value must be an [ISO 693-1] encoded language id.
+    /// If you want to validate the value, use [`validate`] instead.
+    ///
+    /// ```
+    /// # use rosetta_i18n::LanguageId;
+    /// let language_id = LanguageId::new("en");
+    /// assert_eq!(language_id.value(), "en");
+    /// ```
+    ///
+    /// [ISO 693-1]: https://en.wikipedia.org/wiki/ISO_639-1
+    /// [`validate`]: LanguageId::validate
+    pub fn new(value: impl Into<Cow<'a, str>>) -> Self {
+        Self(value.into())
     }
 
     /// Return a reference of the inner value.

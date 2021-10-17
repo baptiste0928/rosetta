@@ -83,9 +83,9 @@ pub mod as_language {
     {
         let language_id = LanguageId::deserialize(deserializer)?;
 
-        match T::from_language_id(language_id) {
+        match T::from_language_id(&language_id) {
             Some(value) => Ok(value),
-            None => Err(de::Error::custom("unsupported language id")),
+            None => Err(de::Error::custom("language `{}` is not supported")),
         }
     }
 
@@ -125,7 +125,7 @@ pub mod as_language_with_fallback {
     {
         let language_id = LanguageId::deserialize(deserializer)?;
 
-        match T::from_language_id(language_id) {
+        match T::from_language_id(&language_id) {
             Some(value) => Ok(value),
             None => Ok(T::fallback()),
         }
@@ -169,7 +169,7 @@ mod tests {
         struct Lang;
 
         impl Language for Lang {
-            fn from_language_id(language_id: LanguageId) -> Option<Self> {
+            fn from_language_id(language_id: &LanguageId) -> Option<Self> {
                 match language_id.value() {
                     "en" => Some(Self),
                     _ => None,
@@ -213,7 +213,7 @@ mod tests {
         struct Lang;
 
         impl Language for Lang {
-            fn from_language_id(language_id: LanguageId) -> Option<Self> {
+            fn from_language_id(language_id: &LanguageId) -> Option<Self> {
                 match language_id.value() {
                     "en" => Some(Self),
                     _ => None,
