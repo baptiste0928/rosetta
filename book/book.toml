@@ -1,0 +1,12 @@
+[book]
+title = "Rosetta Documentation"
+authors = ["baptiste0928"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "output"
+
+[output.html]
+git-repository-url = "https://github.com/baptiste0928/rosetta"
+edit-url-template = "https://github.com/baptiste0928/rosetta/edit/main/book/{path}"

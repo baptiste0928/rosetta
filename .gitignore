@@ -1,3 +1,5 @@
 /target
+/.vscode
+/book/output
+
 Cargo.lock
-.vscode/settings.json
