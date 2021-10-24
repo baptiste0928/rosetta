@@ -1,4 +1,5 @@
 {
     "hello": "Bonjour le monde !",
-    "hello_name": "Bonjour {name} !"
+    "hello_name": "Bonjour {name} !",
+    "display_age": "{name} a {age} ans."
 }

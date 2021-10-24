@@ -37,6 +37,12 @@ mod tests {
     }
 
     #[test]
+    fn test_formatted_multiple() {
+        assert_eq!(Lang::En.display_age(30, "John"), "John is 30 years old.");
+        assert_eq!(Lang::Fr.display_age(30, "John"), "John a 30 ans.");
+    }
+
+    #[test]
     fn test_fallback() {
         assert_eq!(Lang::Fr.fallback_key(), Lang::En.fallback_key());
         assert_eq!(Lang::fallback(), Lang::En);

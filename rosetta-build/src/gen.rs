@@ -10,7 +10,10 @@
 //! Calling [`generate`](CodeGenerator::generate) will produce a [TokenStream]
 //! with the generated code. Internal methods used to generate the output are not exposed.
 
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    iter::FromIterator,
+};
 
 use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream};
@@ -109,11 +112,15 @@ impl<'a> CodeGenerator<'a> {
     /// Generate method for [`TranslationKey::Formatted`]
     fn method_formatted(&self, key: &str, data: &FormattedKey) -> TokenStream {
         let name = Ident::new(&key.to_case(Case::Snake), Span::call_site());
-        let params = data
-            .parameters
+
+        // Sort parameters alphabetically to have consistent ordering
+        let mut sorted = Vec::from_iter(&data.parameters);
+        sorted.sort_by_key(|s| s.to_lowercase());
+        let params = sorted
             .iter()
             .map(|param| Ident::new(param, Span::call_site()))
             .map(|param| quote!(#param: impl ::std::fmt::Display));
+
         let arms = data
             .others
             .iter()

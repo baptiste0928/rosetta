@@ -1,5 +1,6 @@
 {
     "hello": "Hello world!",
     "hello_name": "Hello {name}!",
+    "display_age": "{name} is {age} years old.",
     "fallback_key": "This key does not exist in fr.json"
 }
