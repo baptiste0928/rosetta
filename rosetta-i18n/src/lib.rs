@@ -1,7 +1,7 @@
 //! Easy-to-use i18n library for Rust, based on code generation.
 //!
 //! ## Usage
-//! Please read the [README] on the GitHub repository to learn how to use this library.
+//! Please read the [documentation] to learn how to use this library.
 //!
 //! ```ignore
 //! mod translations {
@@ -17,7 +17,7 @@
 //! This crate provide serialization and deserialization of languages types with Serde.
 //! The `serde` feature must be enabled.
 //!
-//! [README]: https://github.com/baptiste0928/rosetta#readme
+//! [documentation]: https://baptiste0928.github.io/rosetta/
 
 use std::borrow::Cow;
 

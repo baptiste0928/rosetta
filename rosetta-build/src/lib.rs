@@ -2,7 +2,7 @@
 //!
 //! # Usage
 //! Code generation works within [build script]. You only need to configure source files and
-//! the fallback language. Read the [README] in the GitHub repository for more information.
+//! the fallback language. Please read the [documentation] for more information.
 //!
 //! ```no_run
 //! rosetta_build::config()
@@ -13,7 +13,7 @@
 //! ```
 //!
 //! [build script]: https://doc.rust-lang.org/cargo/reference/build-scripts.html
-//! [README]: https://github.com/baptiste0928/rosetta#readme
+//! [documentation]: https://baptiste0928.github.io/rosetta/
 
 pub mod error;
 
