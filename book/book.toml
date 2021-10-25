@@ -1,5 +1,6 @@
 [book]
 title = "Rosetta Documentation"
+description = "Easy to use Rust i18n library based on code generation"
 authors = ["baptiste0928"]
 language = "en"
 src = "src"

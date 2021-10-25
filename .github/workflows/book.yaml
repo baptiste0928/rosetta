@@ -1,6 +1,6 @@
 name: Deploy documentation
 
-on: release
+on: workflow_dispatch
 
 jobs:
   deploy:
@@ -25,5 +25,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./book/output
+          force_orphan: true
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
