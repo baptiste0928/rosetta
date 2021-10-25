@@ -18,6 +18,7 @@
 //! The `serde` feature must be enabled.
 //!
 //! [documentation]: https://baptiste0928.github.io/rosetta/
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 use std::borrow::Cow;
 
