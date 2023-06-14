@@ -175,9 +175,8 @@ impl RosettaConfig {
         let mut file = File::create(&output)?;
         file.write_all(generated.to_string().as_bytes())?;
 
-        if cfg!(feature = "rustfmt") {
-            rustfmt(&output)?;
-        }
+        #[cfg(feature = "rustfmt")]
+        rustfmt(&output)?;
 
         Ok(())
     }
