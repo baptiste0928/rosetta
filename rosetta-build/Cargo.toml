@@ -1,6 +1,6 @@
 [package]
 name = "rosetta-build"
-version = "0.1.2"
+version = "0.1.3"
 description = "Code generation for the Rosetta i18n library."
 categories = ["internationalization", "development-tools::build-utils", "parsing"]
 keywords = ["i18n"]

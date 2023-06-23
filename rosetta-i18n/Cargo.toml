@@ -1,6 +1,6 @@
 [package]
 name = "rosetta-i18n"
-version = "0.1.2"
+version = "0.1.3"
 description = "Easy to use i18n library based on code generation."
 categories = ["internationalization", "development-tools::build-utils", "parsing"]
 keywords = ["i18n"]
