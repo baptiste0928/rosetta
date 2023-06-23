@@ -91,7 +91,7 @@ impl<'a> CodeGenerator<'a> {
             .map(|(language, value)| self.match_arm_simple(language, value));
 
         quote! {
-            #[allow(clippy::match_single_binding)]
+            #[allow(clippy::all)]
             pub fn #name(&self) -> &'static str {
                 match self {
                     #(#arms,)*
@@ -128,7 +128,7 @@ impl<'a> CodeGenerator<'a> {
         let fallback = self.format_formatted(&data.fallback, &data.parameters);
 
         quote! {
-            #[allow(clippy::match_single_binding)]
+            #[allow(clippy::all)]
             pub fn #name(&self, #(#params),*) -> ::std::string::String {
                 match self {
                     #(#arms,)*
