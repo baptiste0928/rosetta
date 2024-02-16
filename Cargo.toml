@@ -4,3 +4,7 @@ members = [
     "rosetta-build",
     "rosetta-test"
 ]
+
+exclude = [
+    "examples"
+]
