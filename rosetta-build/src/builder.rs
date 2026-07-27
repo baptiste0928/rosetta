@@ -145,7 +145,7 @@ impl RosettaConfig {
     /// Returns a list of the languages
     pub fn languages(&self) -> Vec<&LanguageId> {
         let mut languages: Vec<&LanguageId> =
-            self.others.iter().map(|(language, _)| language).collect();
+            self.others.keys().collect();
         languages.push(&self.fallback.0);
         languages
     }
@@ -209,7 +209,7 @@ fn rustfmt(path: &Path) -> Result<(), BuildError> {
     use std::process::Command;
 
     Command::new(env::var("RUSTFMT").unwrap_or_else(|_| "rustfmt".to_string()))
-        .args(&["--emit", "files"])
+        .args(["--emit", "files"])
         .arg(path)
         .output()
         .map_err(BuildError::Fmt)?;

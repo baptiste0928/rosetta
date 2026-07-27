@@ -3,9 +3,8 @@
 //! Files are parsed as [TranslationData] from a provided [JsonValue].
 //! Parsed keys are represented as [TranslationKey].
 
-use std::collections::{HashMap, HashSet};
+use std::{collections::{HashMap, HashSet}, sync::LazyLock};
 
-use lazy_static::lazy_static;
 use regex::Regex;
 use tinyjson::JsonValue;
 
@@ -215,9 +214,7 @@ impl ParsedKey {
     }
 
     fn parse_string(value: String) -> Self {
-        lazy_static! {
-            static ref RE: Regex = Regex::new(r"\{([a-z_]+)\}").unwrap();
-        }
+        static RE:LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\{([a-z_]+)\}").unwrap());
 
         let matches: HashSet<_> = RE
             .captures_iter(&value)

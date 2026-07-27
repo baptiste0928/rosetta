@@ -60,7 +60,7 @@ pub trait Language: Sized {
     /// by the struct.
     fn from_language_id(language_id: &LanguageId) -> Option<Self>;
     /// Convert this struct to a [`LanguageId`].
-    fn language_id(&self) -> LanguageId;
+    fn language_id(&self) -> LanguageId<'_>;
     /// Get the fallback language of this type.
     ///
     /// This fallback value can be used like a default value.
@@ -83,7 +83,7 @@ impl Language for GenericLanguage {
         Some(Self(language_id.value().into()))
     }
 
-    fn language_id(&self) -> LanguageId {
+    fn language_id(&self) -> LanguageId<'_> {
         LanguageId::new(&self.0)
     }
 
