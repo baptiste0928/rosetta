@@ -3,7 +3,10 @@
 //! Files are parsed as [TranslationData] from a provided [JsonValue].
 //! Parsed keys are represented as [TranslationKey].
 
-use std::{collections::{HashMap, HashSet}, sync::LazyLock};
+use std::{
+    collections::{HashMap, HashSet},
+    sync::LazyLock,
+};
 
 use regex::Regex;
 use tinyjson::JsonValue;
@@ -214,7 +217,7 @@ impl ParsedKey {
     }
 
     fn parse_string(value: String) -> Self {
-        static RE:LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\{([a-z_]+)\}").unwrap());
+        static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\{([a-z_]+)\}").unwrap());
 
         let matches: HashSet<_> = RE
             .captures_iter(&value)
@@ -269,7 +272,7 @@ mod tests {
         parsed.parse_file(LanguageId("fr".into()), fr)?;
 
         assert_eq!(parsed.keys.len(), 1);
-        assert!(parsed.keys.get("hello").is_some());
+        assert!(parsed.keys.contains_key("hello"));
 
         let expected = TranslationKey::Simple(SimpleKey {
             fallback: "Hello world!".to_string(),
@@ -292,7 +295,7 @@ mod tests {
         parsed.parse_file(LanguageId("fr".into()), fr)?;
 
         assert_eq!(parsed.keys.len(), 1);
-        assert!(parsed.keys.get("hello").is_some());
+        assert!(parsed.keys.contains_key("hello"));
 
         let expected = TranslationKey::Formatted(FormattedKey {
             fallback: "Hello {name}!".to_string(),

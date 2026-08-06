@@ -144,8 +144,7 @@ pub(crate) struct RosettaConfig {
 impl RosettaConfig {
     /// Returns a list of the languages
     pub fn languages(&self) -> Vec<&LanguageId> {
-        let mut languages: Vec<&LanguageId> =
-            self.others.keys().collect();
+        let mut languages: Vec<&LanguageId> = self.others.keys().collect();
         languages.push(&self.fallback.0);
         languages
     }

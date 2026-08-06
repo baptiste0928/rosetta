@@ -193,7 +193,7 @@ impl<'a> CodeGenerator<'a> {
                     }
                 }
 
-                fn language_id(&self) -> ::rosetta_i18n::LanguageId {
+                fn language_id(&self) -> ::rosetta_i18n::LanguageId<'_> {
                     match self {
                         #(#to_language_id_arms,)*
                     }
